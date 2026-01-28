@@ -1,7 +1,9 @@
 import { checkAuth } from './auth/auth.js';
 import { decodeJWT } from './utils/jwt.js';
 import { graphqlQuery } from './api/client.js';
-import { GET_USER_PROFILE, GET_TOTAL_XP, GET_AUDIT_STATS } from './api/queries.js';
+import { GET_USER_PROFILE, GET_TOTAL_XP, GET_AUDIT_STATS, GET_XP_TRANSACTIONS } from './api/queries.js';
+import { renderXPProgressionChart } from './graphs/xp-over-time.js';
+import { renderAuditComparisonChart } from './graphs/audit-comparison.js';
 
 /**
  * Formats a number with commas
@@ -15,6 +17,7 @@ function formatNumber(num) {
  */
 async function loadProfileData() {
     const infoContent = document.getElementById('info-content');
+    const graphContainer = document.getElementById('graph-container');
     
     try {
         // Get user ID from JWT
@@ -26,17 +29,20 @@ async function loadProfileData() {
         
         // Show loading state
         infoContent.innerHTML = '<p>Loading your profile...</p>';
+        graphContainer.innerHTML = '<p>Loading graphs...</p>';
         
         // Fetch all data in parallel
-        const [userProfile, totalXP, auditStats] = await Promise.all([
+        const [userProfile, totalXP, auditStats, xpTransactions] = await Promise.all([
             graphqlQuery(GET_USER_PROFILE, { userId }),
             graphqlQuery(GET_TOTAL_XP, { userId }),
-            graphqlQuery(GET_AUDIT_STATS, { userId })
+            graphqlQuery(GET_AUDIT_STATS, { userId }),
+            graphqlQuery(GET_XP_TRANSACTIONS, { userId })
         ]);
         
         console.log('User Profile:', userProfile);
         console.log('Total XP:', totalXP);
         console.log('Audit Stats:', auditStats);
+        console.log('XP Transactions:', xpTransactions.transaction.length, 'transactions');
         
         // Extract data
         const user = userProfile.user[0];
@@ -69,12 +75,29 @@ async function loadProfileData() {
             </div>
         `;
         
+        // Render graphs
+        graphContainer.innerHTML = `
+            <div class="graph-wrapper">
+                <div id="xp-chart" class="graph"></div>
+            </div>
+            <div class="graph-wrapper">
+                <div id="audit-chart" class="graph"></div>
+            </div>
+        `;
+        
+        // Give DOM time to render containers
+        setTimeout(() => {
+            renderXPProgressionChart('xp-chart', xpTransactions.transaction);
+            renderAuditComparisonChart('audit-chart', auditData);
+        }, 100);
+        
     } catch (error) {
         console.error('Error loading profile:', error);
         infoContent.innerHTML = `
             <p class="error">Failed to load profile data: ${error.message}</p>
             <button onclick="location.reload()">Retry</button>
         `;
+        graphContainer.innerHTML = '';
     }
 }
 

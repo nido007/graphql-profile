@@ -108,3 +108,54 @@ button {
 button:hover {
     background: #5568d3;
 }
+
+/* Graph Styles */
+.graph-wrapper {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.graph {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.graph-error {
+    color: #e74c3c;
+    text-align: center;
+    padding: 2rem;
+}
+
+.graph-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.5;
+}
+
+.graph-tooltip strong {
+    color: #667eea;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .graph-wrapper {
+        padding: 1rem;
+    }
+}
