@@ -14,7 +14,7 @@ export function renderAuditComparisonChart(containerId, auditData) {
     
     const width = 800;
     const height = 400;
-    const padding = { top: 60, right: 40, bottom: 80, left: 100 };
+    const padding = { top: 60, right: 40, bottom: 80, left: 150 }; // Increased left padding
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
     
@@ -84,12 +84,13 @@ export function renderAuditComparisonChart(containerId, auditData) {
             rect.style.transition = 'width 1s ease-out';
         }, 100);
         
-        // Label
+        // Label (moved further left)
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('x', -10);
+        label.setAttribute('x', -15);
         label.setAttribute('y', bar.y + barHeight / 2 + 5);
         label.setAttribute('text-anchor', 'end');
         label.setAttribute('font-size', '14');
+        label.setAttribute('font-weight', '500');
         label.setAttribute('fill', '#333');
         label.textContent = bar.label;
         chartGroup.appendChild(label);

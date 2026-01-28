@@ -89,3 +89,28 @@ query GetProjectResults($userId: Int!) {
   }
 }
 `;
+
+/**
+ * Query 6: PISCINE PROGRESS (Go/JS)
+ * Demonstrates: Pattern matching with _ilike, nested object data
+ */
+export const GET_PISCINE_STATS = `
+query GetPiscineStats($userId: Int!) {
+  progress(
+    where: { 
+      userId: { _eq: $userId },
+      path: { _ilike: "%piscine%" }
+    }
+    order_by: { createdAt: asc }
+  ) {
+    id
+    grade
+    createdAt
+    path
+    object {
+      name
+      type
+    }
+  }
+}
+`;
