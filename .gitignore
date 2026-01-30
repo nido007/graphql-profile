@@ -2,3 +2,7 @@ node_modules/
 .DS_Store
 *.log
 .env
+
+# Build output (don't commit this)
+dist/
+*.log
