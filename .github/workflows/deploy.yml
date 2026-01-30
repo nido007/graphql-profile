@@ -1,0 +1,60 @@
+name: Deploy GraphQL Profile to GCP
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Create target directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p /home/ubuntu/iminhas.com-site/graphql-profile
+            echo "📁 Directory ready at /home/ubuntu/iminhas.com-site/graphql-profile"
+      
+      - name: Copy files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/*"
+          target: "/home/ubuntu/iminhas.com-site/graphql-profile"
+          strip_components: 1
+          rm: true
+      
+      - name: Verify deployment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "✅ Deployment complete!"
+            echo "📂 Files at: /home/ubuntu/iminhas.com-site/graphql-profile/"
+            ls -la /home/ubuntu/iminhas.com-site/graphql-profile/
+            echo ""
+            echo "🌐 Access at: https://iminhas.com/graphql-profile/"
